@@ -36,3 +36,4 @@ Return format: {hashcode , 0x00 , nonce data}
 Simple encryption for Data.
 First SHA1, then RIPEMD160, then base58check.
 Return the encrypted data.
+This function may be fault, as there are always about ten identical numbers in the result.
