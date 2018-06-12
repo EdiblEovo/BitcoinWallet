@@ -5,9 +5,13 @@
 CLA = 0x80
 
 To access different functions, use INS as below:
+
 getID : 0x81
+
 getName : 0x82
+
 mine : 0x83
+
 generateWallet : 0x84
 
 ## functions
