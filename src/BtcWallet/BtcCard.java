@@ -87,11 +87,11 @@ public class BtcCard extends Applet {
 		
 		apdu.setOutgoingLength((byte)5);
 		
-		buffer[0] = (byte)0x20;
-		buffer[1] = (byte)0x15;
-		buffer[2] = (byte)0x21;
-		buffer[3] = (byte)0x08;
-		buffer[4] = (byte)0x71;
+		buffer[0] = (byte)0x66;
+		buffer[1] = (byte)0x66;
+		buffer[2] = (byte)0x66;
+		buffer[3] = (byte)0x66;
+		buffer[4] = (byte)0x66;
 
 		apdu.sendBytes((short)0, (short)5);
 	}
@@ -106,12 +106,12 @@ public class BtcCard extends Applet {
 		
 		apdu.setOutgoingLength((byte)6);
 		
-		buffer[0] = (byte)0x53;
-		buffer[1] = (byte)0x37;
-		buffer[2] = (byte)0x19;
-		buffer[3] = (byte)0x47;
+		buffer[0] = (byte)0x66;
+		buffer[1] = (byte)0x66;
+		buffer[2] = (byte)0x66;
+		buffer[3] = (byte)0x66;
 		buffer[4] = (byte)0x66;
-		buffer[5] = (byte)0x93;
+		buffer[5] = (byte)0x66;
 
 		apdu.sendBytes((short)0, (short)6);
 	}
