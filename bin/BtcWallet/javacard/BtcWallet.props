@@ -1,0 +1,10 @@
+#package specification
+#Mon Jun 11 20:24:06 CST 2018
+BtcWallet-base=internal
+masktools-version=1.1
+BtcWallet-minor=0
+jcop-packages=BtcWallet
+BtcWallet-major=1
+BtcWallet-clazzes=BtcWallet.Base58 BtcWallet.BtcCard BtcWallet.Ripemd160
+BtcWallet.BtcCard-aid=6564752E627570742E627463
+BtcWallet-aid=6564752E627570742E627463
