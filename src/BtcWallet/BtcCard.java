@@ -39,9 +39,9 @@ public class BtcCard extends Applet {
 	byte[] keyBuffer = JCSystem.makeTransientByteArray((short)256, JCSystem.CLEAR_ON_DESELECT);
 	// 256 byte buffer to hold the key
 	byte[] keyTempBuffer = JCSystem.makeTransientByteArray((short)256, JCSystem.CLEAR_ON_DESELECT);
-	// 256 byte buffer to hold the key
+	// 256 byte buffer to hold the temp key
 	byte[] finalKeyBuffer = JCSystem.makeTransientByteArray((short)256, JCSystem.CLEAR_ON_DESELECT);
-	// 256 byte buffer to hold the key
+	// 256 byte buffer to hold the final key
 	
 	
 	public static void install(byte[] bArray, short bOffset, byte bLength) {
@@ -138,16 +138,21 @@ public class BtcCard extends Applet {
 		for(i=0;i<bytesRead;i++){
 			dataBuffer[i] = (byte)(buffer[ISO7816.OFFSET_CDATA + i] & 0x00FF);
 		}
+		//read the data from Buffer
 
 		nonceLength = 0;
 		maxLength = 0;
-		while(maxLength < 6){
+		while(maxLength < 6){      //the maxLength is set to 6, which means the program stops after nonce is more than 2^(8*6)
 
 			for(i=bytesRead;i<bytesRead+maxLength;i++){
 				dataBuffer[i] = (byte)nonce[i-bytesRead];
 			}
-			Util.arrayCopyNonAtomic(buffer, ISO7816.OFFSET_CDATA, dataBuffer, (short)0, bytesRead);
-			Util.arrayCopyNonAtomic(nonce, (short)0, dataBuffer, bytesRead, maxLength);
+			//add the nonce after data
+			
+			//Util.arrayCopyNonAtomic(buffer, ISO7816.OFFSET_CDATA, dataBuffer, (short)0, bytesRead);
+			//Util.arrayCopyNonAtomic(nonce, (short)0, dataBuffer, bytesRead, maxLength);
+			//no use
+			
 			allLength = bytesRead;
 			allLength += maxLength;
 			pkcs1_sha1(dataBuffer,(short)0,allLength);
@@ -160,15 +165,18 @@ public class BtcCard extends Applet {
 					if(count >= difficulty){
 						break;
 					}
-					s = (byte)((tempBuffer[j] >> k) & 1);
+					
+					//s = (byte)((tempBuffer[j] >> k) & 1);
+					//s is use to check whether the tempBuffer[j]>>k is correct
+					
 					if((((tempBuffer[j] >> k) & 1) | 0) == 1){
 						successFlag = 0;
 						break;
 					}
 					count++;
-				}
+				}     //inner loop
 				j++;
-			}
+			}     //outside loop
 			
 			if(successFlag == 1){
 				break;
@@ -179,13 +187,15 @@ public class BtcCard extends Applet {
 				nonceLength ++;
 			}
 			nonce[nonceLength]++;
+			//move the carry to the next byte
 			
 			if((nonceLength + 1) > maxLength)maxLength = (short)(nonceLength + 1);
+			//update the maxLength
 			nonceLength = 0;
 		}
 		count = 0;
 		
-		if(successFlag == 1){
+		if(successFlag == 1){    //output
 			short le = apdu.setOutgoing();
 			
 			if(le < 2)
@@ -206,7 +216,7 @@ public class BtcCard extends Applet {
 		
 		for(i=0;i<maxLength;i++)
 		{
-			nonce[i] = 0;
+			nonce[i] = 0;  //reset nonce
 		}
 	}
 	
@@ -233,11 +243,11 @@ public class BtcCard extends Applet {
 		for(i=0;i<bytesRead;i++){
 			keyBuffer[i] = (byte)(buffer[ISO7816.OFFSET_CDATA + i] & 0x00FF);
 		}
-		pkcs1_sha1(keyBuffer,(short)0,bytesRead);
+		pkcs1_sha1(keyBuffer,(short)0,bytesRead);    //SHA1
 		for(i=0;i<20;i++){
 			keyBuffer[i] = tempBuffer[i];
 		}
-		Ripemd160.hash32(keyBuffer, (short)0, tempBuffer, (short)0);
+		Ripemd160.hash32(keyBuffer, (short)0, tempBuffer, (short)0);   //Ripemd160
 		for(i=0;i<20;i++){
 			keyBuffer[i] = tempBuffer[i];
 		}
@@ -250,17 +260,17 @@ public class BtcCard extends Applet {
 			keyTempBuffer[i] = tempBuffer[i];
 		}
 		pkcs1_sha1(keyTempBuffer,(short)0,bytesRead);
-		
+		//use tempBuffer to get the double SHA1
 		
 		for(i=0;i<20;i++){
 			keyBuffer[20-i]=keyBuffer[19-i];
 		}
 		keyBuffer[0]=(byte)0;
 		for(i=0;i<4;i++){
-			keyBuffer[21+i]=keyTempBuffer[i];
+			keyBuffer[21+i]=keyTempBuffer[i]; //add mark
 		}
 		
-		i = Base58.encode(keyBuffer, (short)0, (short)25, finalKeyBuffer, (short)0, keyTempBuffer, (short)0);
+		i = Base58.encode(keyBuffer, (short)0, (short)25, finalKeyBuffer, (short)0, keyTempBuffer, (short)0);  //get Base58check
 
 		short le = apdu.setOutgoing();
 		
@@ -274,7 +284,7 @@ public class BtcCard extends Applet {
 		
 		apdu.sendBytes((short)0, (short)50);
 		
-		for(i=0;i<200;i++){
+		for(i=0;i<200;i++){   //reset Buffers
 			keyBuffer[i]=(byte)0;
 			finalKeyBuffer[i]=(byte)0;
 			keyTempBuffer[i]=(byte)0;
